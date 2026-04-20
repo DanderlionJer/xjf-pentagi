@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>xjf-pentagi 控制台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #151c24;
+      --border: #243040;
+      --text: #e7edf4;
+      --muted: #8b9cb3;
+      --accent: #3d9cf5;
+      --accent-dim: #256cad;
+      --ok: #3ecf8e;
+      --warn: #f5a623;
+      --err: #f05b5b;
+      --radius: 10px;
+      --font: "DM Sans", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #121922 0%, var(--bg) 100%);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    header p { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.85rem; }
+    .banner {
+      margin: 0 1.5rem;
+      padding: 0.65rem 1rem;
+      background: rgba(245, 166, 35, 0.12);
+      border: 1px solid rgba(245, 166, 35, 0.35);
+      border-radius: var(--radius);
+      color: #ffc266;
+      font-size: 0.82rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 0;
+      min-height: calc(100vh - 120px);
+    }
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    aside {
+      padding: 1.25rem 1.5rem;
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+    }
+    main { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.35rem; }
+    input[type="text"], input[type="password"], textarea {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.95rem;
+    }
+    textarea { min-height: 72px; font-family: var(--mono); font-size: 0.8rem; resize: vertical; }
+    .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.9rem; }
+    .row:last-child { margin-bottom: 0; }
+    .chk { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: var(--muted); }
+    .chk input { accent-color: var(--accent); }
+    .tabs {
+      display: flex; gap: 0.25rem;
+      padding: 0.25rem;
+      background: var(--panel);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      width: fit-content;
+    }
+    .tabs button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.9rem;
+    }
+    .tabs button.active { background: var(--border); color: var(--text); font-weight: 600; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+    }
+    .panel h2 { margin: 0 0 0.75rem; font-size: 1rem; font-weight: 600; }
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.85rem;
+    }
+    .card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.9rem 1rem;
+    }
+    .card h3 { margin: 0 0 0.35rem; font-size: 0.95rem; }
+    .card .desc { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.82rem; }
+    .tool-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    button.btn {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #1a2330;
+      color: var(--text);
+      cursor: pointer;
+    }
+    button.btn:hover:not(:disabled) { border-color: var(--accent-dim); color: var(--accent); }
+    button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    button.primary {
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+      border-color: var(--accent-dim);
+      color: #fff;
+      font-weight: 600;
+      padding: 0.55rem 1.1rem;
+    }
+    button.primary:hover:not(:disabled) { filter: brightness(1.08); }
+    button.danger-outline {
+      border-color: rgba(240, 91, 91, 0.5);
+      color: var(--err);
+      background: rgba(240, 91, 91, 0.08);
+    }
+    .out {
+      flex: 1;
+      min-height: 280px;
+      max-height: 55vh;
+      overflow: auto;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #0a0e12;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      color: #b8d4f0;
+    }
+    .badge { font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--border); color: var(--muted); }
+    .badge.ok { background: rgba(62, 207, 142, 0.2); color: var(--ok); }
+    .badge.no { background: rgba(240, 91, 91, 0.15); color: var(--err); }
+    .phase-list { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.82rem; }
+    .phase-list li { margin-bottom: 0.35rem; }
+    .pipe-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+    }
+    .pipe-item:last-child { border-bottom: none; }
+    .scope-box { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); max-height: 100px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>xjf-pentagi</h1>
+    <p>图形化编排 · 范围由 <code style="color:var(--accent)">scope.yaml</code> 强制校验</p>
+  </header>
+  <p class="banner" style="margin-top:1rem;">仅在书面授权范围内使用。全链路自动化会在固定侦察流程之后，可选调用 LLM 规划（需配置 OPENAI_API_KEY）。</p>
+
+  <div class="layout">
+    <aside>
+      <div class="row">
+        <div style="flex:1;min-width:200px">
+          <label>目标（主机 / IP / URL）</label>
+          <input type="text" id="target" placeholder="example.com 或 https://example.com/" autocomplete="off" />
+        </div>
+      </div>
+      <div class="row chk">
+        <label><input type="checkbox" id="dryRun" /> 仅校验 / 干跑（不执行二进制）</label>
+      </div>
+      <div class="row chk">
+        <label><input type="checkbox" id="useLlm" checked /> 全链路中包含 LLM 阶段（需 API Key）</label>
+      </div>
+      <div class="row">
+        <div style="flex:1">
+          <label>UI 访问令牌（可选，对应环境变量 XJF_UI_TOKEN）</label>
+          <input type="password" id="uiToken" placeholder="未设置则可留空" autocomplete="off" />
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1">
+          <label>单步工具额外参数（空格分隔，目标会自动加在最后）</label>
+          <textarea id="extraArgs" placeholder="例：nmap 填 -Pn -sV --top-ports 50"></textarea>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:0.5rem">
+        <h2>当前范围摘要</h2>
+        <div id="scopeSummary" class="scope-box">加载中…</div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="tabs" id="tabs">
+        <button type="button" class="active" data-tab="mod">测试模块</button>
+        <button type="button" data-tab="pipe">固定流程</button>
+        <button type="button" data-tab="auto">全链路自动化</button>
+      </div>
+
+      <section class="panel" id="view-mod">
+        <h2>模块 <span class="badge">信息收集 / 方法论</span></h2>
+        <div id="modulesGrid" class="modules-grid">加载中…</div>
+      </section>
+
+      <section class="panel" id="view-pipe" style="display:none">
+        <h2>预置流程链 <span class="badge">pipelines.yaml</span></h2>
+        <div id="pipelinesList">加载中…</div>
+      </section>
+
+      <section class="panel" id="view-auto" style="display:none">
+        <h2>全链路自主渗透</h2>
+        <p style="color:var(--muted);font-size:0.9rem;margin:0 0 1rem">先执行 <code>recon_full</code> 固定流程，然后在启用 API Key 且勾选 LLM 时，由模型在允许目标内追加若干步骤（每步仍过 scope）。</p>
+        <button type="button" class="btn primary" id="btnAutonomous">开始全链路</button>
+      </section>
+
+      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <h2>输出</h2>
+        <div id="out" class="out"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const out = $("out");
+    function log(obj) {
+      const text = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+      out.textContent = text;
+    }
+    function logAppend(line) {
+      out.textContent += (out.textContent ? "\n" : "") + line;
+    }
+
+    function authHeaders() {
+      const h = { "Content-Type": "application/json" };
+      const t = $("uiToken").value.trim();
+      if (t) h["Authorization"] = "Bearer " + t;
+      return h;
+    }
+
+    async function apiGet(path) {
+      const r = await fetch(path, { headers: authHeaders() });
+      const txt = await r.text();
+      let data;
+      try { data = JSON.parse(txt); } catch { data = txt; }
+      if (!r.ok) throw new Error(typeof data === "object" && data.detail ? JSON.stringify(data.detail) : txt);
+      return data;
+    }
+
+    async function apiPost(path, body) {
+      const r = await fetch(path, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(body),
+      });
+      const txt = await r.text();
+      let data;
+      try { data = JSON.parse(txt); } catch { data = txt; }
+      if (!r.ok) throw new Error(typeof data === "object" && data.detail ? JSON.stringify(data.detail) : txt);
+      return data;
+    }
+
+    function parseArgs() {
+      const raw = $("extraArgs").value.trim();
+      if (!raw) return [];
+      return raw.split(/\s+/).filter(Boolean);
+    }
+
+    function currentTarget() {
+      const t = $("target").value.trim();
+      if (!t) throw new Error("请填写目标");
+      return t;
+    }
+
+    async function loadScope() {
+      try {
+        const s = await apiGet("/api/scope");
+        $("scopeSummary").textContent = JSON.stringify(s, null, 2);
+      } catch (e) {
+        $("scopeSummary").textContent = "无法加载: " + e.message;
+      }
+    }
+
+    async function loadModules() {
+      const grid = $("modulesGrid");
+      try {
+        const mods = await apiGet("/api/modules");
+        let phases = [];
+        try { phases = await apiGet("/api/phases"); } catch (_) {}
+        grid.innerHTML = "";
+        for (const m of mods) {
+          const card = document.createElement("div");
+          card.className = "card";
+          const profWarn = m.requires_profile && !m.profile_enabled
+            ? '<span class="badge no">需启用 profile: ' + m.requires_profile + "</span>"
+            : "";
+          card.innerHTML = "<h3>" + (m.title || m.id) + "</h3><p class=\"desc\">" + (m.description || "") + "</p>" + profWarn;
+          if (m.kind === "phases") {
+            const ul = document.createElement("ul");
+            ul.className = "phase-list";
+            for (const p of phases) {
+              const li = document.createElement("li");
+              li.innerHTML = "<strong>" + p.title + "</strong><br/>" + (p.hints || []).join("；");
+              ul.appendChild(li);
+            }
+            card.appendChild(ul);
+          } else {
+            const row = document.createElement("div");
+            row.className = "tool-row";
+            for (const t of m.tools || []) {
+              const b = document.createElement("button");
+              b.type = "button";
+              b.className = "btn";
+              b.textContent = t.id;
+              b.title = t.description || "";
+              b.disabled = !t.allowed;
+              b.onclick = async () => {
+                try {
+                  log("运行 " + t.id + " …");
+                  const rec = await apiPost("/api/exec", {
+                    tool: t.id,
+                    target: currentTarget(),
+                    args: parseArgs(),
+                    dry_run: $("dryRun").checked,
+                  });
+                  log(rec);
+                } catch (e) {
+                  log("错误: " + e.message);
+                }
+              };
+              row.appendChild(b);
+            }
+            card.appendChild(row);
+          }
+          grid.appendChild(card);
+        }
+      } catch (e) {
+        grid.textContent = "加载失败: " + e.message;
+      }
+    }
+
+    async function loadPipelines() {
+      const el = $("pipelinesList");
+      try {
+        const pipes = await apiGet("/api/pipelines");
+        el.innerHTML = "";
+        for (const p of pipes) {
+          const div = document.createElement("div");
+          div.className = "pipe-item";
+          div.innerHTML = "<div><strong>" + p.title + "</strong><br/><span style=\"color:var(--muted);font-size:0.82rem\">" + (p.description || "") + "</span><br/><span class=\"badge\">" + p.step_count + " 步</span> <code style=\"font-size:0.75rem\">" + p.id + "</code></div>";
+          const run = document.createElement("button");
+          run.type = "button";
+          run.className = "btn primary";
+          run.textContent = "运行";
+          run.onclick = async () => {
+            try {
+              log("流程 " + p.id + " …");
+              const res = await apiPost("/api/pipeline", {
+                pipeline: p.id,
+                target: currentTarget(),
+                dry_run: $("dryRun").checked,
+              });
+              log(res);
+            } catch (e) {
+              log("错误: " + e.message);
+            }
+          };
+          div.appendChild(run);
+          el.appendChild(div);
+        }
+      } catch (e) {
+        el.textContent = "加载失败: " + e.message;
+      }
+    }
+
+    $("btnAutonomous").onclick = async () => {
+      try {
+        log("全链路启动…");
+        const res = await apiPost("/api/autonomous", {
+          target: currentTarget(),
+          use_llm: $("useLlm").checked,
+          dry_run: $("dryRun").checked,
+        });
+        log(res);
+      } catch (e) {
+        log("错误: " + e.message);
+      }
+    };
+
+    document.querySelectorAll("#tabs button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#tabs button").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        $("view-mod").style.display = tab === "mod" ? "block" : "none";
+        $("view-pipe").style.display = tab === "pipe" ? "block" : "none";
+        $("view-auto").style.display = tab === "auto" ? "block" : "none";
+      });
+    });
+
+    loadScope();
+    loadModules();
+    loadPipelines();
+  </script>
+</body>
+</html>
