@@ -1,0 +1,19 @@
+services:
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PROFILE: ${XJF_PROFILE:-web}
+    image: xjf-pentagi:local
+    volumes:
+      - ./config:/workspace/config:ro
+      - ./output:/workspace/output
+      - ./src:/workspace/src:ro
+    working_dir: /workspace
+    environment:
+      - XJF_CONFIG_DIR=/workspace/config
+      - XJF_OUTPUT_DIR=/workspace/output
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - XJF_LLM_MODEL=${XJF_LLM_MODEL:-gpt-4o-mini}

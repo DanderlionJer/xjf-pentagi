@@ -1,0 +1,51 @@
+# Declarative tool registry. Binaries must exist in the container/PATH.
+# Add rows as you install more packages in Dockerfile or custom image.
+
+tools:
+  nmap:
+    binary: nmap
+    category: recon
+    profiles: [web_recon, internal]
+    description: "Network port scan and service fingerprinting"
+
+  whois:
+    binary: whois
+    category: recon
+    profiles: [web_recon]
+    description: "Domain registration metadata"
+
+  curl:
+    binary: curl
+    category: recon
+    profiles: [web_recon, internal]
+    description: "HTTP(S) client"
+
+  dig:
+    binary: dig
+    category: recon
+    profiles: [web_recon, internal]
+    description: "DNS queries"
+
+  host:
+    binary: host
+    category: recon
+    profiles: [web_recon, internal]
+    description: "Simple DNS forward/reverse"
+
+  nc:
+    binary: nc
+    category: recon
+    profiles: [web_recon, internal]
+    description: "Netcat (use only inside authorized scope)"
+
+  ldapsearch:
+    binary: ldapsearch
+    category: internal
+    profiles: [internal]
+    description: "LDAP queries (full image profile only)"
+
+  smbclient:
+    binary: smbclient
+    category: internal
+    profiles: [internal]
+    description: "SMB client (full image profile only)"

@@ -1,0 +1,21 @@
+# Copy to scope.yaml and edit. All targets must appear here before exec runs.
+# Use only for assets you are authorized to test.
+
+allowed_hosts:
+  - example.com
+  - www.example.com
+
+allowed_cidrs:
+  - "192.168.56.0/24"
+
+allowed_url_prefixes:
+  - "https://example.com/"
+  - "http://127.0.0.1:8765/"
+
+excluded_hosts: []
+
+max_requests_per_second: 5
+
+profiles:
+  web_recon: true
+  internal: false

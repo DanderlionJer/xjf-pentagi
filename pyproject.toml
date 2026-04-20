@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xjf-pentagi"
+version = "0.1.0"
+description = "Scoped pentest orchestration CLI with optional LLM planning (authorized testing only)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "click>=8.1",
+  "pyyaml>=6.0",
+  "httpx>=0.27",
+]
+
+[project.scripts]
+xjf = "xjf_pentagi.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

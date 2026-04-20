@@ -1,0 +1,17 @@
+# Default lab scope — replace with your authorized targets before real use.
+allowed_hosts:
+  - example.com
+
+allowed_cidrs: []
+
+allowed_url_prefixes:
+  - "https://example.com/"
+  - "http://127.0.0.1:8765/"
+
+excluded_hosts: []
+
+max_requests_per_second: 5
+
+profiles:
+  web_recon: true
+  internal: false
