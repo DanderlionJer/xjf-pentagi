@@ -19,6 +19,8 @@ Scoped orchestration CLI for **authorized** security assessments: declarative to
 
 The sibling project **[xjf-pentagi2](https://github.com/DanderlionJer/xjf-pentagi2)** packages this stack into a Windows `.exe` (Edge window + embedded API). Build once with Python, then distribute only the executable. See that repo’s README for `.\build.bat` in PowerShell vs `build.bat` in cmd.
 
+**Maintaining code vs the EXE:** day-to-day work is this repo (`xjf-pentagi`) plus `xjf-pentagi2` **source** — use `pip install -e` and `xjf serve` / `xjf-pentagi2`; you do **not** need to touch the `.exe` in Git. The executable is only a **frozen snapshot**; changing source does **not** update it. **Rebuild** `xjf-pentagi2.exe` (run `build.bat` there) when you need a new binary for users without Python. Details and Chinese notes: [xjf-pentagi2 README](https://github.com/DanderlionJer/xjf-pentagi2/blob/main/README.md).
+
 ## Web console
 
 Local (after `pip install -e .` and `config/scope.yaml` present):
