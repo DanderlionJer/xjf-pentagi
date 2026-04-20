@@ -6,6 +6,9 @@ services:
       args:
         PROFILE: ${XJF_PROFILE:-web}
     image: xjf-pentagi:local
+    ports:
+      - "${XJF_UI_PORT:-8080}:8080"
+    command: ["xjf", "serve", "--host", "0.0.0.0", "--port", "8080"]
     volumes:
       - ./config:/workspace/config:ro
       - ./output:/workspace/output
@@ -17,3 +20,4 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
       - XJF_LLM_MODEL=${XJF_LLM_MODEL:-gpt-4o-mini}
+      - XJF_UI_TOKEN=${XJF_UI_TOKEN:-}

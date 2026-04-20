@@ -151,6 +151,18 @@ def plan_local() -> None:
     click.echo(json.dumps(payload, ensure_ascii=False, indent=2))
 
 
+@main.command("serve")
+@click.option("--host", default="127.0.0.1", show_default=True, help="Bind address")
+@click.option("--port", default=8080, show_default=True, type=int, help="HTTP port")
+def serve_cmd(host: str, port: int) -> None:
+    """Start the web UI (FastAPI + static console)."""
+    import uvicorn
+
+    from xjf_pentagi.web_app import app
+
+    uvicorn.run(app, host=host, port=port, log_level="info")
+
+
 @main.command("plan-llm")
 @click.option("--goal", required=True, help="High-level authorized task description")
 @click.option("--execute", is_flag=True, help="Run each planned step via exec (still scope-checked)")
