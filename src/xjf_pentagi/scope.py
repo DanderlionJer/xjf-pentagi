@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ipaddress
+import re
 from dataclasses import dataclass
 from ipaddress import IPv4Network, IPv6Network
 from pathlib import Path
@@ -9,7 +10,28 @@ from urllib.parse import urlparse
 
 import yaml
 
+from xjf_pentagi.fsenc import read_text_flexible
+
 _IPNetwork = IPv4Network | IPv6Network
+
+_HOSTISH = re.compile(r"^[A-Za-z0-9._\-]+$")
+
+
+def parse_targets_blob(blob: str) -> list[str]:
+    """Split user paste: lines, optional commas; trim; skip empty and # comments."""
+    out: list[str] = []
+    for raw_line in blob.replace(",", "\n").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        out.append(line)
+    seen: set[str] = set()
+    uniq: list[str] = []
+    for t in out:
+        if t not in seen:
+            seen.add(t)
+            uniq.append(t)
+    return uniq
 
 
 @dataclass
@@ -24,7 +46,7 @@ class Scope:
 
     @classmethod
     def load(cls, path: Path) -> Scope:
-        data: dict[str, Any] = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        data: dict[str, Any] = yaml.safe_load(read_text_flexible(path)) or {}
         cidrs_raw = data.get("allowed_cidrs") or []
         nets: list[_IPNetwork] = []
         for c in cidrs_raw:
@@ -39,8 +61,21 @@ class Scope:
             source_path=path,
         )
 
+    @classmethod
+    def default_permissive(cls) -> Scope:
+        """No whitelist file: targets come from UI / CLI input."""
+        return cls(
+            allowed_hosts=[],
+            allowed_cidrs=[],
+            allowed_url_prefixes=[],
+            excluded_hosts=[],
+            max_requests_per_second=10,
+            profiles={},
+            source_path=None,
+        )
+
     def profile_enabled(self, name: str) -> bool:
-        return bool(self.profiles.get(name, False))
+        return bool(self.profiles.get(name, True))
 
     def _excluded(self, host: str) -> bool:
         h = host.lower().strip(".")
@@ -104,28 +139,54 @@ class Scope:
         return bool(self.host_allowed(parsed.hostname) or self.ip_allowed(parsed.hostname))
 
     def validate_target(self, target: str) -> None:
-        """Raise ValueError if target (host, IP, or URL) is out of scope."""
+        """Syntax check; whitelist applies only if scope.yaml lists are non-empty."""
         t = target.strip()
         if not t:
             raise ValueError("empty target")
         if "://" in t:
-            if not self.url_allowed(t):
-                raise ValueError(f"URL not allowed by scope: {t}")
+            p = urlparse(t)
+            if not p.hostname:
+                raise ValueError(f"invalid URL: {t}")
+            if self._excluded(p.hostname):
+                raise ValueError(f"host excluded: {t}")
+            if self.allowed_hosts or self.allowed_cidrs or self.allowed_url_prefixes:
+                if not self.url_allowed(t):
+                    raise ValueError(f"URL not allowed by scope.yaml: {t}")
             return
         try:
             ipaddress.ip_address(t)
-            if not self.ip_allowed(t):
-                raise ValueError(f"IP not in allowed_cidrs: {t}")
+            if self._excluded(t):
+                raise ValueError(f"IP excluded: {t}")
+            if self.allowed_cidrs and not self.ip_allowed(t):
+                raise ValueError(f"IP not in allowed_cidrs (scope.yaml): {t}")
             return
         except ValueError:
             pass
-        if self.host_allowed(t):
-            return
-        raise ValueError(f"Host not in allowed_hosts: {t}")
+        if " " in t or "\n" in t:
+            raise ValueError("invalid target (use one host per line in the UI)")
+        if not _HOSTISH.match(t):
+            raise ValueError(f"invalid hostname: {t}")
+        if self._excluded(t):
+            raise ValueError(f"host excluded: {t}")
+        if self.allowed_hosts and not self.host_allowed(t):
+            raise ValueError(f"Host not in allowed_hosts (scope.yaml): {t}")
+
+    def allowed_targets_for_llm(self, user_targets: list[str]) -> list[str]:
+        """Optional scope.yaml lists plus user-supplied targets for LLM planning."""
+        out: list[str] = []
+        out.extend(self.allowed_hosts)
+        for net in self.allowed_cidrs:
+            out.append(str(net))
+        out.extend(self.allowed_url_prefixes)
+        for t in user_targets:
+            s = t.strip()
+            if s and s not in out:
+                out.append(s)
+        return out
 
 
 def load_scope_from_env(config_dir: Path) -> Scope:
     path = config_dir / "scope.yaml"
-    if not path.is_file():
-        raise FileNotFoundError(f"Missing scope file: {path}")
-    return Scope.load(path)
+    if path.is_file():
+        return Scope.load(path)
+    return Scope.default_permissive()

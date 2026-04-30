@@ -6,6 +6,8 @@ from typing import Any
 
 import yaml
 
+from xjf_pentagi.fsenc import read_text_flexible
+
 
 @dataclass
 class ToolDef:
@@ -17,7 +19,7 @@ class ToolDef:
 
 
 def load_tools(path: Path) -> dict[str, ToolDef]:
-    data: dict[str, Any] = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    data: dict[str, Any] = yaml.safe_load(read_text_flexible(path)) or {}
     raw = data.get("tools") or {}
     out: dict[str, ToolDef] = {}
     for tid, row in raw.items():
@@ -36,7 +38,4 @@ def load_tools(path: Path) -> dict[str, ToolDef]:
 def tool_allowed_for_scope(tool: ToolDef, scope_profiles: dict[str, bool]) -> bool:
     if not tool.profiles:
         return True
-    for p in tool.profiles:
-        if scope_profiles.get(p):
-            return True
-    return False
+    return any(scope_profiles.get(p, True) for p in tool.profiles)

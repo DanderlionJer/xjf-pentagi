@@ -19,5 +19,7 @@ services:
       - XJF_OUTPUT_DIR=/workspace/output
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - DEEPSEEK_BASE_URL=${DEEPSEEK_BASE_URL:-}
       - XJF_LLM_MODEL=${XJF_LLM_MODEL:-gpt-4o-mini}
       - XJF_UI_TOKEN=${XJF_UI_TOKEN:-}

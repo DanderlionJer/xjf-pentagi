@@ -23,7 +23,7 @@ def run_tool(
     if not tool_allowed_for_scope(tool, scope.profiles):
         raise PermissionError(
             f"Tool '{tool.tool_id}' requires a scope profile in {tool.profiles}; "
-            "enable it in scope.yaml under profiles.*"
+            "enable it in optional scope.yaml (profiles.*), or adjust tools.yaml."
         )
     binary = shutil.which(tool.binary)
     if not binary:

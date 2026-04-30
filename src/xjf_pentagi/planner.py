@@ -6,7 +6,13 @@ from typing import Any
 
 import httpx
 
-from xjf_pentagi.registry import ToolDef
+from xjf_pentagi.llm_compat import (
+    chat_message_content,
+    normalize_openai_compatible_base_url,
+    resolve_llm_api_key,
+    resolve_llm_base_url,
+)
+from xjf_pentagi.registry import ToolDef, tool_allowed_for_scope
 
 
 def _openai_compatible_chat(
@@ -17,6 +23,7 @@ def _openai_compatible_chat(
     system: str,
     user: str,
 ) -> str:
+    base_url = normalize_openai_compatible_base_url(base_url)
     url = base_url.rstrip("/") + "/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     body = {
@@ -31,7 +38,7 @@ def _openai_compatible_chat(
         r = client.post(url, headers=headers, json=body)
         r.raise_for_status()
         data = r.json()
-    return str(data["choices"][0]["message"]["content"])
+    return chat_message_content(data)
 
 
 def build_llm_plan(
@@ -40,17 +47,22 @@ def build_llm_plan(
     allowed_targets: list[str],
     tools: dict[str, ToolDef],
     scope_profiles: dict[str, bool],
+    api_key: str | None = None,
+    base_url: str | None = None,
+    model: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Call an OpenAI-compatible API; return parsed steps or raise."""
-    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is not set")
-    base_url = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1").strip()
-    model = os.environ.get("XJF_LLM_MODEL", "gpt-4o-mini").strip()
+    """Call an OpenAI-compatible /chat/completions API; return parsed steps or raise."""
+    key = resolve_llm_api_key(api_key)
+    if not key:
+        raise RuntimeError(
+            "LLM API key missing: set OPENAI_API_KEY or DEEPSEEK_API_KEY, or pass api_key"
+        )
+    url_base = resolve_llm_base_url(base_url)
+    mdl = (model or os.environ.get("XJF_LLM_MODEL", "gpt-4o-mini")).strip()
 
     tool_lines = []
     for tid, td in sorted(tools.items()):
-        if not any(scope_profiles.get(p) for p in td.profiles):
+        if not tool_allowed_for_scope(td, scope_profiles):
             continue
         tool_lines.append(f"- {tid}: {td.description} (binary: {td.binary})")
     tools_block = "\n".join(tool_lines) if tool_lines else "(none — enable profiles in scope.yaml)"
@@ -70,9 +82,9 @@ def build_llm_plan(
         f"Available tools:\n{tools_block}\n"
     )
     raw = _openai_compatible_chat(
-        base_url=base_url,
-        api_key=api_key,
-        model=model,
+        base_url=url_base,
+        api_key=key,
+        model=mdl,
         system=system,
         user=user,
     )

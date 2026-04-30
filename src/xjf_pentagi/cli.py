@@ -12,7 +12,7 @@ from xjf_pentagi.phases import PHASES
 from xjf_pentagi.planner import build_llm_plan
 from xjf_pentagi.registry import load_tools, tool_allowed_for_scope
 from xjf_pentagi.runner import run_tool
-from xjf_pentagi.scope import Scope, load_scope_from_env
+from xjf_pentagi.scope import Scope, load_scope_from_env, parse_targets_blob
 
 
 def _config_dir() -> Path:
@@ -90,7 +90,7 @@ def tools_list(as_json: bool) -> None:
 @main.command("scope-check")
 @click.argument("target")
 def scope_check(target: str) -> None:
-    """Validate a host, IP, or URL against scope.yaml."""
+    """Validate target syntax (and optional scope.yaml whitelist)."""
     cfg = _config_dir()
     scope = load_scope_from_env(cfg)
     try:
@@ -98,7 +98,7 @@ def scope_check(target: str) -> None:
     except ValueError as e:
         click.echo(f"NOT ALLOWED: {e}", err=True)
         sys.exit(2)
-    click.echo("OK: target is within scope.")
+    click.echo("OK: target is valid.")
 
 
 @main.command("exec")

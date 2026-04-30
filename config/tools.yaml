@@ -6,46 +6,46 @@ tools:
     binary: nmap
     category: recon
     profiles: [web_recon, internal]
-    description: "Network port scan and service fingerprinting"
+    description: "网络端口扫描与服务指纹识别"
 
   whois:
     binary: whois
     category: recon
     profiles: [web_recon]
-    description: "Domain registration metadata"
+    description: "域名注册与备案等公开元数据（whois）"
 
   curl:
     binary: curl
     category: recon
     profiles: [web_recon, internal]
-    description: "HTTP(S) client"
+    description: "HTTP(S) 客户端，请求与探测 Web"
 
   dig:
     binary: dig
     category: recon
     profiles: [web_recon, internal]
-    description: "DNS queries"
+    description: "DNS 查询（dig）"
 
   host:
     binary: host
     category: recon
     profiles: [web_recon, internal]
-    description: "Simple DNS forward/reverse"
+    description: "简单 DNS 正反向解析（host）"
 
   nc:
     binary: nc
     category: recon
     profiles: [web_recon, internal]
-    description: "Netcat (use only inside authorized scope)"
+    description: "Netcat 网络调试（仅在授权范围内使用）"
 
   ldapsearch:
     binary: ldapsearch
     category: internal
     profiles: [internal]
-    description: "LDAP queries (full image profile only)"
+    description: "LDAP 目录查询（需启用 internal profile；仅授权内网/域场景）"
 
   smbclient:
     binary: smbclient
     category: internal
     profiles: [internal]
-    description: "SMB client (full image profile only)"
+    description: "SMB/CIFS 客户端（需启用 internal profile；仅授权内网场景）"

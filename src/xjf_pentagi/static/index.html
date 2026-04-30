@@ -1,433 +1,1436 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
+
 <head>
+
   <meta charset="utf-8" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>xjf-pentagi 控制台</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
   <style>
+
     :root {
+
       --bg: #0f1419;
+
       --panel: #151c24;
+
       --border: #243040;
+
       --text: #e7edf4;
+
       --muted: #8b9cb3;
+
       --accent: #3d9cf5;
+
       --accent-dim: #256cad;
+
       --ok: #3ecf8e;
+
       --warn: #f5a623;
+
       --err: #f05b5b;
+
       --radius: 10px;
+
       --font: "DM Sans", system-ui, sans-serif;
+
       --mono: "JetBrains Mono", ui-monospace, monospace;
+
     }
+
     * { box-sizing: border-box; }
+
     body {
+
       margin: 0;
+
       min-height: 100vh;
+
       background: var(--bg);
+
       color: var(--text);
+
       font-family: var(--font);
+
       font-size: 15px;
+
       line-height: 1.5;
+
     }
+
     header {
+
       padding: 1rem 1.5rem;
+
       border-bottom: 1px solid var(--border);
+
       background: linear-gradient(180deg, #121922 0%, var(--bg) 100%);
+
     }
+
     header h1 {
+
       margin: 0;
+
       font-size: 1.25rem;
+
       font-weight: 600;
+
       letter-spacing: -0.02em;
+
     }
+
     header p { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.85rem; }
+
     .banner {
+
       margin: 0 1.5rem;
+
       padding: 0.65rem 1rem;
+
       background: rgba(245, 166, 35, 0.12);
+
       border: 1px solid rgba(245, 166, 35, 0.35);
+
       border-radius: var(--radius);
+
       color: #ffc266;
+
       font-size: 0.82rem;
+
     }
+
     .layout {
+
       display: grid;
+
       grid-template-columns: 320px 1fr;
+
       gap: 0;
+
       min-height: calc(100vh - 120px);
+
     }
+
     @media (max-width: 960px) {
+
       .layout { grid-template-columns: 1fr; }
+
     }
+
     aside {
+
       padding: 1.25rem 1.5rem;
+
       border-right: 1px solid var(--border);
+
       background: var(--panel);
+
     }
+
     main { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+
     label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.35rem; }
+
     input[type="text"], input[type="password"], textarea {
+
       width: 100%;
+
       padding: 0.55rem 0.75rem;
+
       border-radius: 8px;
+
       border: 1px solid var(--border);
+
       background: var(--bg);
+
       color: var(--text);
+
       font-family: var(--font);
+
       font-size: 0.95rem;
+
     }
+
     textarea { min-height: 72px; font-family: var(--mono); font-size: 0.8rem; resize: vertical; }
+
+    textarea.scope-yaml-editor { min-height: 200px; }
+
     .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.9rem; }
+
     .row:last-child { margin-bottom: 0; }
+
     .chk { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: var(--muted); }
+
     .chk input { accent-color: var(--accent); }
+
     .tabs {
+
       display: flex; gap: 0.25rem;
+
       padding: 0.25rem;
+
       background: var(--panel);
+
       border-radius: var(--radius);
+
       border: 1px solid var(--border);
+
       width: fit-content;
+
     }
+
     .tabs button {
+
       border: none;
+
       background: transparent;
+
       color: var(--muted);
+
       padding: 0.45rem 1rem;
+
       border-radius: 8px;
+
       cursor: pointer;
+
       font-family: var(--font);
+
       font-size: 0.9rem;
+
     }
+
     .tabs button.active { background: var(--border); color: var(--text); font-weight: 600; }
+
     .panel {
+
       background: var(--panel);
+
       border: 1px solid var(--border);
+
       border-radius: var(--radius);
+
       padding: 1rem 1.25rem;
+
     }
+
     .panel h2 { margin: 0 0 0.75rem; font-size: 1rem; font-weight: 600; }
+
     .modules-grid {
+
       display: grid;
+
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+
       gap: 0.85rem;
+
     }
+
     .card {
+
       background: var(--bg);
+
       border: 1px solid var(--border);
+
       border-radius: var(--radius);
+
       padding: 0.9rem 1rem;
+
     }
+
     .card h3 { margin: 0 0 0.35rem; font-size: 0.95rem; }
+
     .card .desc { margin: 0 0 0.75rem; color: var(--muted); font-size: 0.82rem; }
+
     .tool-row { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
     button.btn {
+
       font-family: var(--font);
+
       font-size: 0.82rem;
+
       padding: 0.35rem 0.65rem;
+
       border-radius: 7px;
+
       border: 1px solid var(--border);
+
       background: #1a2330;
+
       color: var(--text);
+
       cursor: pointer;
+
     }
+
     button.btn:hover:not(:disabled) { border-color: var(--accent-dim); color: var(--accent); }
+
     button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
     button.primary {
+
       background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+
       border-color: var(--accent-dim);
+
       color: #fff;
+
       font-weight: 600;
+
       padding: 0.55rem 1.1rem;
+
     }
+
     button.primary:hover:not(:disabled) { filter: brightness(1.08); }
+
     button.danger-outline {
+
       border-color: rgba(240, 91, 91, 0.5);
+
       color: var(--err);
+
       background: rgba(240, 91, 91, 0.08);
+
     }
+
     .out {
+
       flex: 1;
+
       min-height: 280px;
+
       max-height: 55vh;
+
       overflow: auto;
+
       font-family: var(--mono);
+
       font-size: 0.78rem;
+
       white-space: pre-wrap;
+
       word-break: break-word;
+
       background: #0a0e12;
+
       border: 1px solid var(--border);
+
       border-radius: var(--radius);
+
       padding: 1rem;
+
       color: #b8d4f0;
+
     }
+
     .badge { font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 4px; background: var(--border); color: var(--muted); }
+
     .badge.ok { background: rgba(62, 207, 142, 0.2); color: var(--ok); }
+
     .badge.no { background: rgba(240, 91, 91, 0.15); color: var(--err); }
+
     .phase-list { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.82rem; }
+
     .phase-list li { margin-bottom: 0.35rem; }
+
     .pipe-item {
+
       display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+
       padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+
     }
+
     .pipe-item:last-child { border-bottom: none; }
+
     .scope-box { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); max-height: 100px; overflow: auto; }
+
+
+
+    .guide-panel { margin: 0 1.5rem; max-width: 100%; box-sizing: border-box; }
+
+    .guide-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.65rem; }
+
+    .guide-toolbar h2 { margin: 0; font-size: 1.02rem; font-weight: 600; }
+
+    .guide-steps { margin: 0; padding-left: 1.15rem; color: var(--text); font-size: 0.86rem; line-height: 1.55; }
+
+    .guide-steps li { margin-bottom: 0.55rem; }
+
+    .guide-steps strong { color: var(--accent); }
+
+    .guide-mini { margin-left: 0.35rem; font-size: 0.72rem; padding: 0.12rem 0.45rem; vertical-align: middle; }
+
+    .guide-body.collapsed { display: none; }
+
+    .guide-foot { margin: 0.65rem 0 0; font-size: 0.78rem; color: var(--muted); }
+
+
+
+
+    .simple-wizard-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(8,12,18,0.93); display: flex; align-items: center; justify-content: center; padding: 1.25rem; }
+    .simple-wizard-overlay.done { display: none; }
+    .simple-wizard-card { max-width: 520px; width: 100%; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.35rem 1.5rem; box-shadow: 0 24px 70px rgba(0,0,0,0.5); }
+    .wiz-progress { color: var(--muted); font-size: 0.8rem; margin-bottom: 1rem; letter-spacing: 0.08em; }
+    .wiz-step { display: none; }
+    .wiz-step.active { display: block; }
+    .wiz-step h2 { margin: 0 0 0.75rem; font-size: 1.1rem; }
+    .wiz-step p.hint { color: var(--muted); font-size: 0.88rem; margin: 0 0 1rem; line-height: 1.55; }
+    .wiz-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.25rem; align-items: center; }
+    .wiz-actions .btn.primary { flex: 1; min-width: 120px; }
+    .adv-details summary { list-style: none; }
+    .adv-details summary::-webkit-details-marker { display: none; }
+
   </style>
+
 </head>
+
 <body>
+
   <header>
+
     <h1>xjf-pentagi</h1>
-    <p>图形化编排 · 范围由 <code style="color:var(--accent)">scope.yaml</code> 强制校验</p>
+    <p style="margin:0.35rem 0 0;font-size:0.82rem"><button type="button" class="btn" id="wizReopen" style="font-size:0.8rem;padding:0.25rem 0.6rem">重新打开分步引导</button></p>
+
+    <p>图形化编排 · <strong>受测目标</strong>在左侧多行框填写；<code style="color:var(--accent)">scope.yaml</code> 仅可选（高级白名单 / profile）</p>
+
   </header>
-  <p class="banner" style="margin-top:1rem;">仅在书面授权范围内使用。全链路自动化会在固定侦察流程之后，可选调用 LLM 规划（需配置 OPENAI_API_KEY）。</p>
+
+  <p class="banner" style="margin-top:1rem;">仅在书面授权范围内使用。全链路自动化会在固定侦察流程之后，可选调用 LLM 规划（需配置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY）。</p>
+
+
+
+  <div class="panel guide-panel" id="guidePanel">
+
+    <div class="guide-toolbar">
+
+      <h2>新手引导：不懂渗透测试也可以按这个顺序做</h2>
+
+      <button type="button" class="btn" id="btnGuideToggle" aria-expanded="true">收起引导</button>
+
+    </div>
+
+    <div id="guideBody" class="guide-body">
+
+      <ol class="guide-steps">
+
+        <li><strong>第 1 步</strong> 合规：只对你有书面授权或自有资产测试。未授权扫描可能违法。</li>
+
+        <li><strong>第 2 步</strong> 填写测试目标：左侧「测试目标」输入域名或完整 URL。 <button type="button" class="btn guide-mini" onclick="guideFocusTarget()">跳到这里</button></li>
+
+        <li><strong>第 3 步（推荐新手）</strong> 勾选「仅校验/干跑」：先不真实执行工具，熟悉流程。 <button type="button" class="btn guide-mini" onclick="guideScrollTo('dryRun')">找到开关</button></li>
+
+        <li><strong>第 4 步</strong> 选模式：上方三个标签——「测试模块」单步点工具；「固定流程」跑预置流水线；「全链路自动化」一键连贯。 <button type="button" class="btn guide-mini" onclick="guideSwitchTab('mod')">测试模块</button> <button type="button" class="btn guide-mini" onclick="guideSwitchTab('pipe')">固定流程</button> <button type="button" class="btn guide-mini" onclick="guideSwitchTab('auto')">全链路</button></li>
+
+        <li><strong>第 5 步（可选）</strong> 大模型：若要智能规划，勾选「启用 LLM」并填 API 或配置环境变量。 <button type="button" class="btn guide-mini" onclick="guideScrollTo('llmApiKey')">跳到 LLM</button></li>
+
+        <li><strong>第 6 步</strong> 点击对应按钮执行，在页面下方「输出」查看结果与报错。 <button type="button" class="btn guide-mini" onclick="guideScrollTo('out')">查看输出</button></li>
+
+      </ol>
+
+      <p class="guide-foot">提示：必须用浏览器打开 <code>http://127.0.0.1:8080</code> （不要用双击 index.html 的 file:// 方式）。若设置了 XJF_UI_TOKEN，左侧「UI 访问令牌」须填一致。</p>
+
+    </div>
+
+  </div>
+
+
+
+
+  <div id="simpleWizard" class="simple-wizard-overlay" role="dialog" aria-labelledby="wizTitle">
+    <div class="simple-wizard-card">
+      <div class="wiz-progress" id="wizProgress">步骤 1 / 4</div>
+      <div id="wizStep1" class="wiz-step active">
+        <h2 id="wizTitle">要测试的网站是？</h2>
+        <p class="hint">只填<strong>你已获授权</strong>的目标。支持完整网址（https://）或域名（如 example.com）。点「下一步」会自动写入授权范围配置。</p>
+        <label style="font-size:0.75rem;color:var(--muted)">网站地址</label>
+        <input type="text" id="wizUrl" placeholder="https://example.com 或 example.com" autocomplete="off" style="width:100%;margin-top:0.35rem;padding:0.55rem 0.75rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text)" />
+        <p class="hint" style="margin-top:0.75rem">提示：若页面要求登录令牌，先在下方「高级选项」里填写 UI 访问令牌。</p>
+      </div>
+      <div id="wizStep2" class="wiz-step">
+        <h2>需要「智能助手」吗？</h2>
+        <p class="hint">开启后，部分阶段会用大模型做规划（可选）。若服务器已配置好密钥，这里可以留空。</p>
+        <label style="display:flex;gap:0.5rem;align-items:center;cursor:pointer">
+          <input type="checkbox" id="wizUseLlm" checked /> <span>开启智能助手（与左侧「使用 LLM」同步）</span>
+        </label>
+        <div id="wizLlmKeyWrap" style="margin-top:1rem">
+          <label style="font-size:0.75rem;color:var(--muted)">密钥（可选）</label>
+          <input type="password" id="wizLlmKey" placeholder="没有可留空" autocomplete="off" style="width:100%;margin-top:0.35rem" />
+        </div>
+        <details style="margin-top:0.75rem;color:var(--muted);font-size:0.82rem">
+          <summary style="cursor:pointer;color:var(--accent)">技术服务地址 / 模型（一般不用改）</summary>
+          <div class="row" style="margin-top:0.5rem">
+            <div style="flex:1;min-width:120px">
+              <label style="font-size:0.75rem">服务地址</label>
+              <input type="text" id="wizLlmBase" placeholder="https://api.openai.com/v1 或 https://api.deepseek.com" style="width:100%;margin-top:0.25rem" />
+            </div>
+            <div style="flex:1;min-width:100px">
+              <label style="font-size:0.75rem">模型</label>
+              <input type="text" id="wizLlmModel" placeholder="gpt-4o-mini" style="width:100%;margin-top:0.25rem" />
+            </div>
+          </div>
+        </details>
+      </div>
+      <div id="wizStep3" class="wiz-step">
+        <h2>先演练一下？</h2>
+        <p class="hint">勾选后只打印将要执行的命令，不真正跑工具。</p>
+        <label style="display:flex;gap:0.5rem;align-items:center;cursor:pointer">
+          <input type="checkbox" id="wizDryRun" /> <span>演练模式（不执行真实命令）</span>
+        </label>
+      </div>
+      <div id="wizStep4" class="wiz-step">
+        <h2>可以开始了</h2>
+        <p class="hint" id="wizRecap"> </p>
+        <p class="hint">进入后左侧可展开「高级选项」。主区域默认打开「测试模块」。</p>
+      </div>
+      <div class="wiz-actions">
+        <button type="button" class="btn" id="wizBack" style="display:none">上一步</button>
+        <button type="button" class="btn primary" id="wizNext">下一步</button>
+        <button type="button" class="btn" id="wizSkip" style="margin-left:auto;font-size:0.85rem;color:var(--muted);border:none;background:transparent">跳过引导</button>
+      </div>
+    </div>
+  </div>
 
   <div class="layout">
+
     <aside>
+
       <div class="row">
+
         <div style="flex:1;min-width:200px">
-          <label>目标（主机 / IP / URL）</label>
-          <input type="text" id="target" placeholder="example.com 或 https://example.com/" autocomplete="off" />
+
+          <label>测试目标（例：www.baidu.com 或完整 URL）</label>
+
+          <input type="text" id="targetUrl" placeholder="www.baidu.com" autocomplete="off" style="width:100%;padding:0.55rem 0.65rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:0.95rem" />
+
         </div>
+
       </div>
+
       <div class="row chk">
+
         <label><input type="checkbox" id="dryRun" /> 仅校验 / 干跑（不执行二进制）</label>
+
       </div>
+
       <div class="row chk">
-        <label><input type="checkbox" id="useLlm" checked /> 全链路中包含 LLM 阶段（需 API Key）</label>
+
+        <label><input type="checkbox" id="useLlm" checked /> 启用 LLM 规划阶段 </label>
+
       </div>
+
+
+
+      <details class="adv-details" id="advancedConfig" style="margin-top:0.5rem;border:1px solid var(--border);border-radius:var(--radius);padding:0.45rem 0.65rem;background:var(--bg)">
+        <summary style="cursor:pointer;color:var(--accent);font-size:0.88rem;user-select:none;padding:0.35rem 0">高级选项（API 密钥、服务地址、scope 配置等）- 新手可跳过</summary>
+        <div style="margin-top:0.65rem">
+      <div class="panel" style="margin-top:0.35rem;padding:0.65rem 0.75rem">
+
+        <h3 style="margin:0 0 0.5rem;font-size:0.95rem">外部 LLM（OpenAI / DeepSeek 等兼容 <code>/v1/chat/completions</code>）</h3>
+
+        <div class="row">
+
+          <div style="flex:1;min-width:120px">
+
+            <label style="font-size:0.8rem;color:var(--muted)">API Key</label>
+
+            <input type="password" id="llmApiKey" placeholder="可填 sk-... 或留空用环境变量" autocomplete="off" style="width:100%" />
+
+          </div>
+
+        </div>
+
+        <div class="row" style="margin-top:0.35rem">
+
+          <div style="flex:1;min-width:120px">
+
+            <label style="font-size:0.8rem;color:var(--muted)">Base URL</label>
+
+            <input type="text" id="llmBaseUrl" placeholder="https://api.openai.com/v1 或 https://api.deepseek.com" autocomplete="off" style="width:100%" />
+
+          </div>
+
+          <div style="flex:1;min-width:100px">
+
+            <label style="font-size:0.8rem;color:var(--muted)">模型</label>
+
+            <input type="text" id="llmModel" placeholder="gpt-4o-mini / deepseek-chat" autocomplete="off" style="width:100%" />
+
+          </div>
+
+        </div>
+
+      </div>
+
       <div class="row">
+
         <div style="flex:1">
+
           <label>UI 访问令牌（可选，对应环境变量 XJF_UI_TOKEN）</label>
+
           <input type="password" id="uiToken" placeholder="未设置则可留空" autocomplete="off" />
+
         </div>
+
       </div>
+
       <div class="row">
+
         <div style="flex:1">
+
           <label>单步工具额外参数（空格分隔，目标会自动加在最后）</label>
+
           <textarea id="extraArgs" placeholder="例：nmap 填 -Pn -sV --top-ports 50"></textarea>
+
         </div>
+
       </div>
+
       <div class="panel" style="margin-top:0.5rem">
+
         <h2>当前范围摘要</h2>
-        <div id="scopeSummary" class="scope-box">加载中…</div>
+
+        <p id="scopeHuman" style="margin:0 0 0.5rem;font-size:0.88rem;line-height:1.5;color:var(--text)"></p><div id="scopeSummary" style="display:none" class="scope-box">加载中…</div>
+
       </div>
-    </aside>
+
+      <div class="panel" style="margin-top:0.5rem">
+
+        <h2>可选：高级范围 / profile (scope.yaml)</h2>
+
+        <p style="color:var(--muted);font-size:0.85rem;margin:0 0 0.5rem">日常无需配置。仅在需要显式白名单或关闭某些工具 profile 时编辑保存；保存后会刷新上方摘要。</p>
+
+        <textarea id="scopeYaml" class="scope-yaml-editor" placeholder="加载中…"></textarea>
+
+        <div class="row" style="margin-top:0.5rem">
+
+          <button type="button" id="btnScopeYamlReload">重新加载</button>
+
+          <button type="button" id="btnScopeYamlSave">保存</button>
+
+          <span id="scopeYamlStatus" style="color:var(--muted);font-size:0.85rem"></span>
+
+        </div>
+
+      </div>
+
+        </div>
+      </details>
+
+        </aside>
+
+
 
     <main>
+
       <div class="tabs" id="tabs">
+
         <button type="button" class="active" data-tab="mod">测试模块</button>
+
+        <button type="button" data-tab="nl">自然语言</button>
+
         <button type="button" data-tab="pipe">固定流程</button>
+
         <button type="button" data-tab="auto">全链路自动化</button>
+
       </div>
 
+
+
       <section class="panel" id="view-mod">
+
         <h2>模块 <span class="badge">信息收集 / 方法论</span></h2>
+
         <div id="modulesGrid" class="modules-grid">加载中…</div>
+
       </section>
+
+      <section class="panel" id="view-nl" style="display:none">
+        <h2>自然语言 <span class="badge">LLM</span></h2>
+        <p class="hint" style="margin:0 0 1rem;line-height:1.5">用中文说明你想做的<strong>已授权</strong>测试。系统会用大模型理解意图、选择预置流程并执行，最后用中文总结结果（需在侧栏「高级选项」配置 LLM，并先把目标写入授权范围）。</p>
+        <label style="display:block;margin-bottom:0.35rem;font-size:0.9rem;color:var(--muted)">你想做什么</label>
+        <textarea id="nlMessage" rows="5" class="scope-yaml-editor" style="min-height:120px;font-family:var(--font);font-size:0.95rem" placeholder="例如：对 www.example.com 做主机信息收集和 Web 探活，先干跑不真实执行。"></textarea>
+        <div class="tool-row" style="margin-top:0.75rem;align-items:center;gap:0.75rem">
+          <button type="button" class="btn primary" id="btnNaturalRun">理解并运行</button>
+          <span class="hint" style="margin:0">「仅校验/干跑」沿用左侧全局开关。</span>
+        </div>
+      </section>
+
+
 
       <section class="panel" id="view-pipe" style="display:none">
+
         <h2>预置流程链 <span class="badge">pipelines.yaml</span></h2>
+
         <div id="pipelinesList">加载中…</div>
+
       </section>
 
+
+
       <section class="panel" id="view-auto" style="display:none">
-        <h2>全链路自主渗透</h2>
-        <p style="color:var(--muted);font-size:0.9rem;margin:0 0 1rem">先执行 <code>recon_full</code> 固定流程，然后在启用 API Key 且勾选 LLM 时，由模型在允许目标内追加若干步骤（每步仍过 scope）。</p>
+
+        <h2>全链路自动化与透镜</h2>
+
+        <p style="color:var(--muted);font-size:0.9rem;margin:0 0 1rem">先执行 <code>recon_full</code> 固定流程，然后若配置 API Key 且勾选 LLM 时会由模型对目标追加规划步骤（每步仍受 scope）。</p>
+
+        <div class="row" style="margin-top:0.5rem">
+
+          <button type="button" class="btn primary" id="btnQuickStart" style="font-size:1rem;padding:0.55rem 1.1rem">开始测试</button>
+
+          <span style="color:var(--muted);font-size:0.85rem;margin-left:0.5rem">侦察 + 可选 LLM</span>
+
+        </div>
+
         <button type="button" class="btn primary" id="btnAutonomous">开始全链路</button>
+
       </section>
 
       <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+
         <h2>输出</h2>
+
         <div id="out" class="out"></div>
+
       </div>
+
     </main>
+
   </div>
 
+
+
   <script>
+
     const $ = (id) => document.getElementById(id);
+
     const out = $("out");
+
     function log(obj) {
+
       const text = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+
       out.textContent = text;
+
     }
+
     function logAppend(line) {
+
       out.textContent += (out.textContent ? "\n" : "") + line;
+
     }
+
+
 
     function authHeaders() {
+
       const h = { "Content-Type": "application/json" };
+
       const t = $("uiToken").value.trim();
+
       if (t) h["Authorization"] = "Bearer " + t;
+
       return h;
+
     }
+
+
 
     async function apiGet(path) {
+
       const r = await fetch(path, { headers: authHeaders() });
+
       const txt = await r.text();
+
       let data;
+
       try { data = JSON.parse(txt); } catch { data = txt; }
+
       if (!r.ok) throw new Error(typeof data === "object" && data.detail ? JSON.stringify(data.detail) : txt);
+
       return data;
+
     }
+
+
 
     async function apiPost(path, body) {
+
       const r = await fetch(path, {
+
         method: "POST",
+
         headers: authHeaders(),
+
         body: JSON.stringify(body),
+
       });
+
       const txt = await r.text();
+
       let data;
+
       try { data = JSON.parse(txt); } catch { data = txt; }
+
       if (!r.ok) throw new Error(typeof data === "object" && data.detail ? JSON.stringify(data.detail) : txt);
+
       return data;
+
     }
+
+
+
+    async function apiPut(path, body) {
+
+      const r = await fetch(path, {
+
+        method: "PUT",
+
+        headers: authHeaders(),
+
+        body: JSON.stringify(body),
+
+      });
+
+      const txt = await r.text();
+
+      let data;
+
+      try { data = JSON.parse(txt); } catch { data = txt; }
+
+      if (!r.ok) throw new Error(typeof data === "object" && data.detail ? JSON.stringify(data.detail) : txt);
+
+      return data;
+
+    }
+
+
 
     function parseArgs() {
+
       const raw = $("extraArgs").value.trim();
+
       if (!raw) return [];
+
       return raw.split(/\s+/).filter(Boolean);
+
     }
 
-    function currentTarget() {
-      const t = $("target").value.trim();
-      if (!t) throw new Error("请填写目标");
-      return t;
+
+
+    function normalizeTarget(raw) {
+
+      let s = (raw || "").trim();
+
+      if (!s) throw new Error("请填写测试目标");
+
+      if (!s.includes("://")) {
+
+        if (/^[A-Za-z0-9._\-]+$/.test(s)) {
+
+          s = "https://" + s.replace(/\/$/, "") + "/";
+
+        }
+
+      }
+
+      return s;
+
+    }
+
+
+
+    function currentTargets() {
+
+      return [normalizeTarget($("targetUrl").value)];
+
+    }
+
+
+
+    function llmPayload() {
+
+      const o = {};
+
+      const k = $("llmApiKey").value.trim();
+
+      const u = $("llmBaseUrl").value.trim();
+
+      const m = $("llmModel").value.trim();
+
+      if (k) o.llm_api_key = k;
+
+      if (u) o.llm_base_url = u;
+
+      if (m) o.llm_model = m;
+
+      return o;
+
+    }
+
+
+
+    function formatScopeHuman(s) {
+      const lines = [];
+      const hosts = (s.allowed_hosts || []).filter(Boolean);
+      const prefs = (s.allowed_url_prefixes || []).filter(Boolean);
+      const prof = s.profiles || {};
+      if (hosts.length) lines.push('允许的主机名：' + hosts.join('、'));
+      else lines.push('允许的主机名：（未限制列表，仍请只在授权目标上使用）');
+      if (prefs.length) lines.push('允许的网址前缀：' + prefs.join('、'));
+      else lines.push('允许的网址前缀：（未限制）');
+      const wr = prof.web_recon !== false;
+      const intr = prof.internal === true;
+      lines.push('能力开关：外网侦察 ' + (wr ? '已开' : '已关') + '；内网相关工具 ' + (intr ? '已开' : '已关') + '。');
+      return lines.join("\n");
     }
 
     async function loadScope() {
+      const hum = $("scopeHuman");
+      const raw = $("scopeSummary");
       try {
         const s = await apiGet("/api/scope");
-        $("scopeSummary").textContent = JSON.stringify(s, null, 2);
+        if (hum) hum.textContent = formatScopeHuman(s);
+        if (raw) raw.textContent = JSON.stringify(s, null, 2);
       } catch (e) {
-        $("scopeSummary").textContent = "无法加载: " + e.message;
+        if (hum) hum.textContent = '无法加载授权范围：' + e.message;
+        if (raw) raw.textContent = '';
       }
     }
+
+
+
+    async function loadScopeYaml() {
+
+      const st = $("scopeYamlStatus");
+
+      st.textContent = "";
+
+      try {
+
+        const data = await apiGet("/api/scope-yaml");
+
+        $("scopeYaml").value = data.yaml || "";
+
+      } catch (e) {
+
+        $("scopeYaml").value = "";
+
+        st.textContent = "无法加载: " + e.message;
+
+      }
+
+    }
+
+
+
+    async function saveScopeYaml() {
+
+      const st = $("scopeYamlStatus");
+
+      st.textContent = "";
+
+      try {
+
+        await apiPut("/api/scope-yaml", { yaml: $("scopeYaml").value });
+
+        st.textContent = "已保存";
+
+        await loadScope();
+
+      } catch (e) {
+
+        st.textContent = "保存失败: " + e.message;
+
+      }
+
+    }
+
+
 
     async function loadModules() {
+
       const grid = $("modulesGrid");
+
       try {
+
         const mods = await apiGet("/api/modules");
+
         let phases = [];
+
         try { phases = await apiGet("/api/phases"); } catch (_) {}
+
         grid.innerHTML = "";
+
         for (const m of mods) {
+
           const card = document.createElement("div");
+
           card.className = "card";
+
           const profWarn = m.requires_profile && !m.profile_enabled
+
             ? '<span class="badge no">需启用 profile: ' + m.requires_profile + "</span>"
+
             : "";
+
           card.innerHTML = "<h3>" + (m.title || m.id) + "</h3><p class=\"desc\">" + (m.description || "") + "</p>" + profWarn;
+
           if (m.kind === "phases") {
+
             const ul = document.createElement("ul");
+
             ul.className = "phase-list";
+
             for (const p of phases) {
+
               const li = document.createElement("li");
+
               li.innerHTML = "<strong>" + p.title + "</strong><br/>" + (p.hints || []).join("；");
+
               ul.appendChild(li);
+
             }
+
             card.appendChild(ul);
+
           } else {
+
             const row = document.createElement("div");
+
             row.className = "tool-row";
+
             for (const t of m.tools || []) {
+
               const b = document.createElement("button");
+
               b.type = "button";
+
               b.className = "btn";
+
               b.textContent = t.id;
+
               b.title = t.description || "";
+
               b.disabled = !t.allowed;
+
               b.onclick = async () => {
+
                 try {
+
                   log("运行 " + t.id + " …");
+
                   const rec = await apiPost("/api/exec", {
+
                     tool: t.id,
-                    target: currentTarget(),
+
+                    targets: currentTargets(),
+
                     args: parseArgs(),
+
                     dry_run: $("dryRun").checked,
+
                   });
+
                   log(rec);
+
                 } catch (e) {
+
                   log("错误: " + e.message);
+
                 }
+
               };
+
               row.appendChild(b);
+
             }
+
             card.appendChild(row);
+
           }
+
           grid.appendChild(card);
+
         }
+
       } catch (e) {
+
         grid.textContent = "加载失败: " + e.message;
+
       }
+
     }
+
+
 
     async function loadPipelines() {
+
       const el = $("pipelinesList");
+
       try {
+
         const pipes = await apiGet("/api/pipelines");
+
         el.innerHTML = "";
+
         for (const p of pipes) {
+
           const div = document.createElement("div");
+
           div.className = "pipe-item";
+
           div.innerHTML = "<div><strong>" + p.title + "</strong><br/><span style=\"color:var(--muted);font-size:0.82rem\">" + (p.description || "") + "</span><br/><span class=\"badge\">" + p.step_count + " 步</span> <code style=\"font-size:0.75rem\">" + p.id + "</code></div>";
+
           const run = document.createElement("button");
+
           run.type = "button";
+
           run.className = "btn primary";
+
           run.textContent = "运行";
+
           run.onclick = async () => {
+
             try {
+
               log("流程 " + p.id + " …");
+
               const res = await apiPost("/api/pipeline", {
+
                 pipeline: p.id,
-                target: currentTarget(),
+
+                targets: currentTargets(),
+
                 dry_run: $("dryRun").checked,
+
               });
+
               log(res);
+
             } catch (e) {
+
               log("错误: " + e.message);
+
             }
+
           };
+
           div.appendChild(run);
+
           el.appendChild(div);
+
         }
+
       } catch (e) {
+
         el.textContent = "加载失败: " + e.message;
+
       }
+
     }
 
-    $("btnAutonomous").onclick = async () => {
-      try {
-        log("全链路启动…");
-        const res = await apiPost("/api/autonomous", {
-          target: currentTarget(),
-          use_llm: $("useLlm").checked,
-          dry_run: $("dryRun").checked,
-        });
-        log(res);
-      } catch (e) {
-        log("错误: " + e.message);
-      }
-    };
 
-    document.querySelectorAll("#tabs button").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("#tabs button").forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        const tab = btn.dataset.tab;
-        $("view-mod").style.display = tab === "mod" ? "block" : "none";
-        $("view-pipe").style.display = tab === "pipe" ? "block" : "none";
-        $("view-auto").style.display = tab === "auto" ? "block" : "none";
-      });
+
+    async function runAutonomous() {
+
+      try {
+
+        log("开始测试…");
+
+        const body = {
+
+          targets: currentTargets(),
+
+          use_llm: $("useLlm").checked,
+
+          dry_run: $("dryRun").checked,
+
+          ...llmPayload(),
+
+        };
+
+        const res = await apiPost("/api/autonomous", body);
+
+        log(res);
+
+      } catch (e) {
+
+        log("错误: " + e.message);
+
+      }
+
+    }
+
+    $("btnAutonomous").onclick = () => runAutonomous();
+
+    $("btnQuickStart").onclick = () => runAutonomous();
+
+    $("btnNaturalRun").addEventListener("click", async () => {
+      const msg = ($("nlMessage").value || "").trim();
+      if (!msg) {
+        alert("请先输入你的需求（自然语言）。");
+        return;
+      }
+      log("正在请大模型理解意图并运行流程，请稍候…");
+      try {
+        const body = {
+          message: msg,
+          dry_run: $("dryRun").checked,
+          llm_api_key: $("llmApiKey").value || undefined,
+          llm_base_url: $("llmBaseUrl").value || undefined,
+          llm_model: $("llmModel").value || undefined,
+        };
+        const res = await apiPost("/api/natural", body);
+        let text = res.reply || "";
+        if (res.intent_brief) text += "\n\n——\n理解摘要： " + res.intent_brief;
+        text += "\n\n（完整结构化结果已打印到浏览器控制台，按 F12 打开。）";
+        $("out").textContent = text;
+        console.log("xjf natural raw", res.raw);
+        const outEl = $("out");
+        if (outEl) outEl.scrollIntoView({ behavior: "smooth", block: "end" });
+      } catch (e) {
+        alert(e.message);
+        log(String(e.message || e));
+      }
     });
 
+    document.querySelectorAll("#tabs button").forEach((btn) => {
+
+      btn.addEventListener("click", () => {
+
+        document.querySelectorAll("#tabs button").forEach((b) => b.classList.remove("active"));
+
+        btn.classList.add("active");
+
+        const tab = btn.dataset.tab;
+
+        $("view-mod").style.display = tab === "mod" ? "block" : "none";
+
+        $("view-nl").style.display = tab === "nl" ? "block" : "none";
+
+        $("view-pipe").style.display = tab === "pipe" ? "block" : "none";
+
+        $("view-auto").style.display = tab === "auto" ? "block" : "none";
+
+      });
+
+    });
+
+
+
+
+
+    function guideFocusTarget() {
+
+      const el = $("targetUrl");
+
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      el.focus();
+
+    }
+
+    function guideScrollTo(id) {
+
+      const el = $(id);
+
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    }
+
+    function guideSwitchTab(tab) {
+
+      const b = document.querySelector('#tabs button[data-tab="' + tab + '"]');
+
+      if (b) {
+
+        b.click();
+
+        b.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      }
+
+    }
+
+
+    window._wizStep = 1;
+    function wizShowStep(n) {
+      window._wizStep = n;
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById("wizStep" + i);
+        if (el) el.classList.toggle("active", i === n);
+      }
+      const pr = document.getElementById("wizProgress");
+      if (pr) pr.textContent = "\u6b65\u9aa4 " + n + " / 4";
+      const back = document.getElementById("wizBack");
+      const next = document.getElementById("wizNext");
+      if (back) back.style.display = n > 1 ? "inline-block" : "none";
+      if (next) next.textContent = n === 4 ? "\u8fdb\u5165\u5de5\u4f5c\u53f0" : "\u4e0b\u4e00\u6b65";
+    }
+    function wizClose() {
+      const w = document.getElementById("simpleWizard");
+      if (w) {
+        w.classList.add("done");
+        try { localStorage.setItem("xjf_simple_wizard_done", "1"); } catch (_) {}
+      }
+    }
+    function wizOpen() {
+      const w = document.getElementById("simpleWizard");
+      if (w) w.classList.remove("done");
+    }
+    function initSimpleWizard() {
+      const w = document.getElementById("simpleWizard");
+      if (!w) return;
+      try {
+        if (localStorage.getItem("xjf_simple_wizard_done") === "1") w.classList.add("done");
+      } catch (_) {}
+      const url = document.getElementById("wizUrl");
+      const step2sync = () => {
+        const c = document.getElementById("wizUseLlm");
+        const main = document.getElementById("useLlm");
+        if (c && main) main.checked = c.checked;
+      };
+      document.getElementById("wizSkip").addEventListener("click", wizClose);
+      document.getElementById("wizBack").addEventListener("click", () => {
+        const n = window._wizStep || 1;
+        if (n > 1) wizShowStep(n - 1);
+      });
+      document.getElementById("wizNext").addEventListener("click", async () => {
+        let step = window._wizStep || 1;
+        if (step === 1) {
+          const raw = (url && url.value || "").trim();
+          if (!raw) { alert("\u8bf7\u586b\u5199\u7f51\u7ad9\u5730\u5740"); return; }
+          let norm;
+          try { norm = normalizeTarget(raw); } catch (e) { alert(e.message); return; }
+          const tu = document.getElementById("targetUrl");
+          if (tu) tu.value = raw.includes("://") ? raw : raw.replace(/\/$/, "");
+          try {
+            await apiPost("/api/scope/quick-target", { url: norm });
+          } catch (e) {
+            alert("\u5199\u5165\u6388\u6743\u8303\u56f4\u5931\u8d25\uff1a" + e.message);
+          }
+          step2sync();
+          wizShowStep(2);
+          return;
+        }
+        if (step === 2) {
+          step2sync();
+          const k = document.getElementById("wizLlmKey");
+          const bk = document.getElementById("llmApiKey");
+          if (k && bk) bk.value = k.value;
+          const b = document.getElementById("wizLlmBase");
+          const bb = document.getElementById("llmBaseUrl");
+          if (b && bb) bb.value = b.value || bb.getAttribute("placeholder") || "";
+          const m = document.getElementById("wizLlmModel");
+          const mm = document.getElementById("llmModel");
+          if (m && mm) mm.value = m.value || mm.getAttribute("placeholder") || "";
+          wizShowStep(3);
+          return;
+        }
+        if (step === 3) {
+          const d = document.getElementById("wizDryRun");
+          const dr = document.getElementById("dryRun");
+          if (d && dr) dr.checked = d.checked;
+          const recap = document.getElementById("wizRecap");
+          const tu = document.getElementById("targetUrl");
+          const tval = tu ? tu.value : "";
+          const llm = document.getElementById("useLlm") && document.getElementById("useLlm").checked;
+          const dry = dr && dr.checked;
+          if (recap) {
+            recap.textContent =
+              "\u76ee\u6807\uff1a" + tval + "\u3002" +
+              (llm ? "\u5df2\u5f00\u542f\u667a\u80fd\u52a9\u624b\u3002" : "\u672a\u5f00\u542f\u667a\u80fd\u52a9\u624b\u3002") +
+              (dry ? "\u6f14\u7ec3\u6a21\u5f0f\u3002" : "\u5c06\u6267\u884c\u771f\u5b9e\u547d\u4ee4\u3002");
+          }
+          wizShowStep(4);
+          return;
+        }
+        wizClose();
+        await loadScope();
+        await loadScopeYaml();
+        await loadModules();
+        await loadPipelines();
+        const modTab = document.querySelector('#tabs button[data-tab="mod"]');
+        if (modTab) modTab.click();
+        const outEl = document.getElementById("out");
+        if (outEl) outEl.scrollIntoView({ behavior: "smooth", block: "end" });
+      });
+    }
+
+    (function initGuide() {
+
+      const body = document.getElementById("guideBody");
+
+      const btn = document.getElementById("btnGuideToggle");
+
+      if (!body || !btn) return;
+
+      const key = "xjf_pentagi_guide_collapsed";
+
+      function apply(collapsed) {
+
+        body.classList.toggle("collapsed", collapsed);
+
+        btn.textContent = collapsed ? "\u5c55\u5f00\u5f15\u5bfc" : "\u6536\u8d77\u5f15\u5bfc";
+
+        btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+
+        try { localStorage.setItem(key, collapsed ? "1" : "0"); } catch (_) {}
+
+      }
+
+      try {
+
+        if (localStorage.getItem(key) === "1") apply(true);
+
+      } catch (_) {}
+
+      btn.addEventListener("click", function () {
+
+        apply(!body.classList.contains("collapsed"));
+
+      });
+
+    })();
+
+
+
+    $("btnScopeYamlReload").addEventListener("click", () => loadScopeYaml());
+
+    $("btnScopeYamlSave").addEventListener("click", () => saveScopeYaml());
+
+
+
     loadScope();
+
+    loadScopeYaml();
+
     loadModules();
+
     loadPipelines();
-  </script>
+
+    initSimpleWizard();
+    const wr = document.getElementById("wizReopen");
+    if (wr) wr.addEventListener("click", () => {
+      try { localStorage.removeItem("xjf_simple_wizard_done"); } catch (_) {}
+      wizOpen();
+      wizShowStep(1);
+    });
+</script>
+
 </body>
+
 </html>
+

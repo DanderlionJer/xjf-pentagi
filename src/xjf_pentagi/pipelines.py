@@ -5,6 +5,7 @@ from typing import Any
 
 import yaml
 
+from xjf_pentagi.fsenc import read_text_flexible
 from xjf_pentagi.registry import ToolDef, load_tools, tool_allowed_for_scope
 from xjf_pentagi.runner import run_tool
 from xjf_pentagi.scope import Scope
@@ -12,7 +13,7 @@ from xjf_pentagi.targets import resolve_step_target
 
 
 def load_pipelines(path: Path) -> dict[str, dict[str, Any]]:
-    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    data = yaml.safe_load(read_text_flexible(path)) or {}
     raw = data.get("pipelines") or {}
     if not isinstance(raw, dict):
         return {}
